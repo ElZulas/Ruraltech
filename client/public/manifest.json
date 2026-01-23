@@ -1,0 +1,42 @@
+{
+  "name": "RuralTech - Gestión Inteligente de Ganado",
+  "short_name": "RuralTech",
+  "description": "Aplicación para gestión completa de ganado",
+  "start_url": "/app/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["agriculture", "productivity", "business"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Animales",
+      "short_name": "Animales",
+      "description": "Ver mis animales",
+      "url": "/app/animals",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Alertas",
+      "short_name": "Alertas",
+      "description": "Ver alertas de vacunas",
+      "url": "/app/alerts",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
