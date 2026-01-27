@@ -11,4 +11,4 @@ $env:ASPNETCORE_ENVIRONMENT = "Development"
 
 # Ejecutar API
 Write-Host "Ejecutando dotnet run..." -ForegroundColor Yellow
-dotnet run --urls "http://localhost:5000"
+dotnet run --urls "http://localhost:5002"
