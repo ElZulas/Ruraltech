@@ -18,13 +18,13 @@ Una vez creado el proyecto:
 
 1. Ve a **Settings** (⚙️) > **API**
 2. Anota estos valores:
-   - **Project URL**: `https://xxxxx.supabase.co`
-   - **anon public key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
-   - **service_role key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` (⚠️ Mantén esto secreto)
+   - **Project URL**: `https://vaeufppoexhsmrlgjnai.supabase.co`
+   - **anon public key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhZXVmcHBvZXhoc21ybGdqbmFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwMDczODYsImV4cCI6MjA4NDU4MzM4Nn0.puEYw8T7YgsgCW8kd_tzSUj7V8gqhM5QysLxWO5nZPo`
+   - **service_role key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhZXVmcHBvZXhoc21ybGdqbmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTAwNzM4NiwiZXhwIjoyMDg0NTgzMzg2fQ.4nUSmyDM8zxzGgfSZu57exWXc4MyLiZ8U7HhoHpyhC8` (⚠️ Mantén esto secreto)
 
 3. Ve a **Settings** > **Database**
 4. En "Connection string" selecciona **URI**
-5. Copia la cadena de conexión (formato: `postgresql://postgres:[PASSWORD]@db.xxxxx.supabase.co:5432/postgres`)
+5. Copia la cadena de conexión (formato: `postgresql://postgres:a.h.a.v'.s.m_34@db.vaeufppoexhsmrlgjnai.supabase.co:5432/postgres`)
 
 ## Paso 3: Crear las Tablas en Supabase
 

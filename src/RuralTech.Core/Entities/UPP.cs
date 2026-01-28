@@ -17,5 +17,8 @@ public class UPP
     
     // Relaciones
     public List<Animal> Animals { get; set; } = new();
+    public List<Bovino> Bovinos { get; set; } = new();
+    public List<LoteAves> LotesAves { get; set; } = new();
     public List<Colaborador> Colaboradores { get; set; } = new();
+    public List<Infraestructura> Infraestructuras { get; set; } = new();
 }

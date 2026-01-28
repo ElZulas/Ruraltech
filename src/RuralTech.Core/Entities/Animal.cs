@@ -13,6 +13,8 @@ public class Animal
     public User User { get; set; } = null!;
     public Guid? UPPId { get; set; }
     public UPP? UPP { get; set; }
+    public Guid? InfraestructuraId { get; set; }
+    public Infraestructura? Infraestructura { get; set; }
     public List<WeightRecord> WeightHistory { get; set; } = new();
     public List<Vaccine> Vaccines { get; set; } = new();
     public List<Treatment> Treatments { get; set; } = new();
