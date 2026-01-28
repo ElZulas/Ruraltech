@@ -1,0 +1,179 @@
+RESUMEN DE CAMBIOS Y TESTEOS - COWNECT
+==========================================
+
+wenas, este es el resumen de todo lo que hice desde que cloné el repo nuevo xd
+
+PRIMERO QUE NADA - CLON Y CONFIGURACIÓN
+-----------------------------------------
+- Cloné el repo de https://github.com/Trinidad006/Cownect.git
+- Lo puse en mi carpeta CowNect del escritorio
+- Configuré el remote upstream para conectarlo con el repo original de ElZulas
+- Hice push de los cambios al repo original para que se actualizara
+
+INICIAR TODO EL PROYECTO
+-------------------------
+- Inicié la API en el puerto 5002 (http://localhost:5002)
+- Inicié el frontend React en el puerto 3000 (http://localhost:3000)
+- Todo funcionando bien, la landing page se veía chida
+
+CONFIGURACIÓN DE SUPABASE
+--------------------------
+- Me diste las credenciales de Supabase y las configuré en appsettings.json
+- Project URL: https://vaeufppoexhsmrlgjnai.supabase.co
+- Configuré la conexión a PostgreSQL de Supabase
+- La API ahora se conecta directo a Supabase en vez de SQLite
+
+LANDING PAGE Y REGISTROS
+-------------------------
+- Al principio creé una tabla LandingPageLeads para guardar los registros del formulario
+- Pero luego me di cuenta que ya se estaba guardando en Users xddd
+- Entonces eliminé toda la cosa de LandingPageLeads y mejor hice que el formulario guarde directo en Users
+- Creé un endpoint /api/auth/register-lead que guarda en Users con contraseña temporal
+- El formulario de la landing page ahora funciona y guarda todo en la BD de Supabase
+
+MERGE CON EL REPO ORIGINAL
+----------------------------
+- Hice pull del repo original y traje todas las nuevas funcionalidades:
+  - Bovinos (controlador completo)
+  - Lotes de Aves (con bitácoras y todo)
+  - Infraestructura
+  - Eventos de Bovino
+  - Y un montón de migraciones SQL nuevas
+- Resolví los conflictos en ApplicationDbContext.cs
+- Todo quedó integrado bien
+
+PÁGINA DE DESCARGA DE APP
+--------------------------
+- Creé una página /download-app que se muestra después de login/registro
+- Tiene botones para descargar Android (disponible), Windows e iOS (próximamente)
+- El diseño está chido, similar a la landing page
+- Cambié el flujo para que después de registrarse/iniciar sesión vaya a la página de descarga en vez del dashboard
+
+APP FLUTTER - ANDROID
+----------------------
+- Creé la carpeta tests/ para guardar los APKs de prueba (NO se descargan públicamente)
+- Los APKs de prueba se guardan con nombres test1.apk, test2.apk, test3.apk, etc.
+- Creé estructura de releases/ con carpetas: prealpha/, alpha/, beta/, snapshots/
+- Versiones aprobadas: El servidor busca beta -> alpha -> prealpha (la más estable primero)
+- Snapshots: Tienen su propio endpoint /download/android/snapshot
+- IMPORTANTE: Las snapshots NO tienen acceso a la BD del servidor, usan SQLite local
+- Las snapshots solo están disponibles en Android y tienen su propio botón en la página
+- Actualicé el diseño de login y registro para que se parezca a la landing page (negro y blanco, elegante)
+- Creé servicios para todas las entidades:
+  - UPPService
+  - ColaboradoresService
+  - BovinosService
+  - AnimalsService
+- Implementé la pantalla completa de Colaboradores con CRUD:
+  - Listar colaboradores por UPP
+  - Agregar colaborador (nombre, PIN, teléfono, rol)
+  - Cambiar estatus (ACTIVO/SUSPENDIDO)
+  - Eliminar colaborador
+  - Todo se guarda en la BD de Supabase
+- Creé el dashboard con navegación por tabs
+- Las pantallas base para UPPs, Animales y Bovinos están creadas pero falta implementarlas completamente
+- El diseño es consistente, todo negro y blanco como la landing page
+
+ENDPOINT DE DESCARGA
+--------------------
+- Actualicé el DownloadController para buscar el APK en varias ubicaciones
+- El endpoint /api/download/android está listo para servir el APK cuando lo compilemos
+
+BASE DE DATOS
+-------------
+- Ejecuté el script FIX-DATABASE.sql en Supabase para:
+  - Agregar UpdatedAt a Animals y Products
+  - Crear la tabla LandingPageLeads (aunque ya no la usamos xd)
+- La conexión a Supabase funciona bien
+- Todos los cambios se reflejan en la BD
+
+ESTADO ACTUAL
+-------------
+✅ API funcionando en puerto 5002
+✅ Frontend funcionando en puerto 3000
+✅ Conexión a Supabase configurada
+✅ Formulario de landing page guarda en Users
+✅ App Flutter lista para compilar (falta hacer flutter build apk)
+✅ Página de descarga implementada
+✅ Gestión de colaboradores completa en la app
+✅ Diseño consistente en toda la app
+
+COMPILACIÓN COMPLETADA
+-----------------------
+✅ Compilé test1.apk exitosamente (46.95 MB) - Configuración: localhost:5002
+✅ Compilé test2.apk exitosamente (46.95 MB) - Configuración: 192.168.1.64:5002
+✅ Ambos APKs guardados en flutter-app/tests/
+✅ Estructura de Android creada (android/)
+✅ Permisos de internet configurados
+✅ Nombre de la app: "Cownect"
+✅ test1.apk: Para emulador o desarrollo local (localhost)
+✅ test2.apk: Para dispositivos físicos en la misma red WiFi (IP local)
+
+POR HACER
+---------
+- Compilar versión aprobada (prealpha/alpha/beta) y ponerla en releases/
+- Implementar completamente las pantallas de UPPs, Animales y Bovinos en Flutter
+- Agregar pantallas para Infraestructura, Lotes de Aves y Marketplace
+- Cuando haya snapshots: Configurar BD local y flag SNAPSHOT=true
+- Compilar apps para Windows e iOS (próximamente)
+
+NOTA SOBRE SNAPSHOTS
+--------------------
+Las snapshots están preparadas pero todavía no hay ninguna. Cuando las hagas:
+- Deben compilarse con --dart-define=SNAPSHOT=true
+- NO pueden acceder a la BD del servidor (solo SQLite local)
+- Tienen su propio botón de descarga en la página
+- Solo disponibles para Android
+
+PUBLICACIÓN EN PRODUCCIÓN
+--------------------------
+✅ Configuré la app para cambiar fácilmente entre desarrollo y producción
+✅ En api_config.dart puedes cambiar 'development' a 'production'
+✅ Cuando tengas un servidor en la nube (Railway, Render, Azure, etc.):
+   - Cambia environment = 'production'
+   - Pega la URL de tu servidor en productionBaseUrl
+   - Recompila y listo
+✅ La base de datos ya está en Supabase (en la nube), así que no hay problema
+✅ Creé DEPLOY-PRODUCCION.md con guía completa de hosting
+
+TEST3.APK - ARREGLO COMPLETO DE CONEXIÓN
+-----------------------------------------
+✅ PROBLEMA ARREGLADO: El servidor ahora escucha en 0.0.0.0:5002 (todas las interfaces)
+   - Antes solo escuchaba en localhost, por eso los dispositivos no podían conectarse
+   - Ahora funciona desde dispositivos móviles en la misma red WiFi
+✅ Mejoré el manejo de errores de conexión en api_service.dart
+✅ Agregué timeout de 30 segundos para las peticiones
+✅ Mensajes de error más claros y útiles que explican qué verificar
+✅ Mejoré la visualización de errores en login_screen y register_screen
+✅ Actualicé CORS para permitir apps móviles también en desarrollo
+✅ Actualicé run-api.ps1 para usar 0.0.0.0:5002
+✅ test3.apk recompilado y actualizado en tests/
+✅ Creé INICIO-SERVIDOR.md con instrucciones claras
+
+NOTAS FINALES
+-------------
+Todo está funcionando bien, la app se ve chida y el diseño es consistente. 
+Los cambios se guardan correctamente en Supabase y todo está conectado.
+✅ Ya compilé test1.apk y está en tests/ (aunque los tests no se descargan públicamente todavía)
+✅ Cuando tengas una versión aprobada, ponla en releases/beta/, releases/alpha/ o releases/prealpha/
+✅ Las snapshots van en releases/snapshots/ cuando las hagas
+
+Eso es todo por ahora xd
+
+PREALPHA PUBLICADA
+------------------
+✅ Copié test3.apk a releases/prealpha/Cownect-PreAlpha.apk
+✅ La versión PreAlpha ahora está disponible para descarga pública
+✅ URL de la Landing Page desde celular: http://192.168.1.64:3000
+✅ URL de descarga directa: http://192.168.1.64:5002/api/download/android
+✅ Creé URLS-ACCESO.md con todas las URLs importantes
+
+CONFIGURACIÓN FINAL
+--------------------
+✅ Frontend configurado para escuchar en 0.0.0.0:3000 (accesible desde dispositivos móviles)
+✅ Backend configurado para escuchar en 0.0.0.0:5002 (accesible desde dispositivos móviles)
+✅ Scripts creados para facilitar el cambio de IP (OBTENER-IP.ps1, CAMBIAR-IP.ps1)
+✅ Scripts para permitir puertos en firewall (PERMITIR-PUERTO-3000.ps1, PERMITIR-PUERTO-FIREWALL.ps1)
+✅ Guía completa para deploy en Azure (PREPARAR-PARA-AZURE.md)
+✅ Todo probado y funcionando correctamente
+✅ Creé COMO-EJECUTAR.md con guía completa de cómo ejecutar los comandos

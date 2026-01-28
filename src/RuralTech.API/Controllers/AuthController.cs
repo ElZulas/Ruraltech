@@ -10,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
+using AllowAnonymousAttribute = Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute;
 
 namespace RuralTech.API.Controllers;
 
@@ -19,11 +20,13 @@ public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(ApplicationDbContext context, IConfiguration configuration)
+    public AuthController(ApplicationDbContext context, IConfiguration configuration, ILogger<AuthController> logger)
     {
         _context = context;
         _configuration = configuration;
+        _logger = logger;
     }
 
     [HttpPost("register")]
@@ -105,30 +108,70 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
-        // Permitir login con email o teléfono
-        var user = await _context.Users.FirstOrDefaultAsync(u => 
-            u.Email == dto.Email || u.Phone == dto.Email);
-
-        if (user == null || !PasswordHasher.VerifyPassword(dto.Password, user.PasswordHash))
+        try
         {
-            return Unauthorized(new { message = "Credenciales inválidas" });
-        }
-
-        var token = GenerateJwtToken(user);
-
-        return Ok(new
-        {
-            token,
-            user = new
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
             {
-                id = user.Id,
-                email = user.Email,
-                fullName = user.FullName,
-                dateOfBirth = user.DateOfBirth,
-                phone = user.Phone,
-                location = user.Location
+                return BadRequest(new { message = "Email y contraseña son requeridos" });
             }
-        });
+
+            // Permitir login con email o teléfono
+            User? user = null;
+            try
+            {
+                user = await _context.Users.FirstOrDefaultAsync(u => 
+                    u.Email == dto.Email || u.Phone == dto.Email);
+            }
+            catch (Exception dbEx)
+            {
+                _logger.LogError(dbEx, "Error consultando base de datos en login");
+                return StatusCode(500, new { message = "Error de conexión a la base de datos. Verifica que Supabase esté accesible." });
+            }
+
+            if (user == null)
+            {
+                return Unauthorized(new { message = "Credenciales inválidas" });
+            }
+
+            if (string.IsNullOrWhiteSpace(user.PasswordHash))
+            {
+                return Unauthorized(new { message = "Usuario no tiene contraseña configurada" });
+            }
+
+            if (!PasswordHasher.VerifyPassword(dto.Password, user.PasswordHash))
+            {
+                return Unauthorized(new { message = "Credenciales inválidas" });
+            }
+
+            var token = GenerateJwtToken(user);
+
+            return Ok(new
+            {
+                token,
+                user = new
+                {
+                    id = user.Id,
+                    email = user.Email,
+                    fullName = user.FullName,
+                    dateOfBirth = user.DateOfBirth,
+                    phone = user.Phone,
+                    location = user.Location
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            // Log del error para debugging
+            _logger.LogError(ex, "Error en login para email: {Email}", dto?.Email);
+            
+            // Si es error de base de datos, dar mensaje más específico
+            if (ex.Message.Contains("database") || ex.Message.Contains("connection") || ex.Message.Contains("Supabase") || ex.Message.Contains("Npgsql"))
+            {
+                return StatusCode(500, new { message = "Error de conexión a la base de datos. Verifica que Supabase esté accesible." });
+            }
+            
+            return StatusCode(500, new { message = $"Error interno: {ex.Message}" });
+        }
     }
 
     [HttpGet("me")]
@@ -182,6 +225,66 @@ public class AuthController : ControllerBase
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
+    }
+
+    [HttpPost("register-lead")]
+    [AllowAnonymous]
+    public async Task<IActionResult> RegisterLead([FromBody] RegisterLeadDto dto)
+    {
+        try
+        {
+            // Validaciones básicas
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                return BadRequest(new { message = "El nombre es requerido" });
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Email))
+            {
+                return BadRequest(new { message = "El email es requerido" });
+            }
+
+            // Validar formato de email
+            if (!Regex.IsMatch(dto.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                return BadRequest(new { message = "El formato del email no es válido" });
+            }
+
+            // Verificar si el email ya existe
+            if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+            {
+                return BadRequest(new { message = "Este email ya está registrado. Por favor inicia sesión o usa otro email." });
+            }
+
+            // Crear usuario como lead (sin contraseña activa todavía)
+            // Fecha de nacimiento por defecto: 25 años atrás (para cumplir validación de edad)
+            var defaultDateOfBirth = DateTime.UtcNow.AddYears(-25).Date;
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Email = dto.Email.Trim().ToLower(),
+                PasswordHash = PasswordHasher.HashPassword("TempPassword123!"), // Contraseña temporal
+                FullName = dto.Name.Trim(),
+                DateOfBirth = defaultDateOfBirth,
+                Phone = string.IsNullOrWhiteSpace(dto.Phone) ? null : dto.Phone.Trim(),
+                Location = string.IsNullOrWhiteSpace(dto.Message) ? null : dto.Message.Trim(),
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "¡Gracias por tu interés! Te hemos registrado. Revisa tu email para más información.",
+                userId = user.Id
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error al procesar tu registro. Por favor intenta más tarde." });
+        }
     }
 
     [HttpPost("colaborador/login")]

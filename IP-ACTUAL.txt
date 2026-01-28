@@ -1,0 +1,8 @@
+IP ACTUAL: 10.234.89.228
+
+URLs para acceder desde tu celular:
+- Landing Page: http://10.234.89.228:3000
+- Swagger: http://10.234.89.228:5002/swagger
+- API: http://10.234.89.228:5002/api
+
+Los servidores deberían estar iniciándose ahora en ventanas separadas de PowerShell.

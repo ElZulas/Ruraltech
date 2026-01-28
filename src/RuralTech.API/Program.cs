@@ -51,18 +51,41 @@ else
 {
     // Usar Supabase PostgreSQL
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(connectionString));
+        options.UseNpgsql(connectionString, npgsqlOptions =>
+        {
+            npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 3,
+                maxRetryDelay: TimeSpan.FromSeconds(5),
+                errorCodesToAdd: null);
+        }));
 }
 
 // CORS
 builder.Services.AddCors(options =>
 {
+    // Para desarrollo (web y dispositivos móviles)
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "https://localhost:3000")
+        policy.WithOrigins(
+                "http://localhost:3000", 
+                "http://localhost:5173", 
+                "https://localhost:3000",
+                "http://10.234.89.228:3000",  // IP actual
+                "http://10.3.0.235:3000",  // IP anterior (por si acaso)
+                "http://192.168.1.64:3000" // IP de casa
+              )
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
+    });
+    
+    // Para producción (app móvil y web)
+    // Permite todas las conexiones desde apps móviles (no tienen origen específico)
+    options.AddPolicy("AllowMobileApp", policy =>
+    {
+        policy.AllowAnyOrigin()  // Apps móviles no tienen origen específico
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
@@ -97,7 +120,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowReactApp");
+// Usar CORS según el entorno
+// En desarrollo, permitir tanto web como apps móviles
+if (app.Environment.IsDevelopment())
+{
+    // Permitir apps móviles también en desarrollo
+    app.UseCors("AllowMobileApp");
+}
+else
+{
+    // En producción, permitir apps móviles
+    app.UseCors("AllowMobileApp");
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
@@ -112,16 +146,34 @@ try
         
         try
         {
-            db.Database.EnsureCreated();
-            logger.LogInformation("Database created/verified successfully");
+            // Intentar conectar a la base de datos
+            logger.LogInformation("Intentando conectar a la base de datos...");
+            var canConnect = db.Database.CanConnect();
             
-            // Seed database with test data
-            RuralTech.Infrastructure.Data.DatabaseSeeder.Seed(db);
-            logger.LogInformation("Database seeded successfully");
+            if (canConnect)
+            {
+                logger.LogInformation("Conexión a la base de datos exitosa");
+                db.Database.EnsureCreated();
+                logger.LogInformation("Database created/verified successfully");
+                
+                // Seed database with test data
+                RuralTech.Infrastructure.Data.DatabaseSeeder.Seed(db);
+                logger.LogInformation("Database seeded successfully");
+            }
+            else
+            {
+                logger.LogWarning("No se pudo conectar a la base de datos. Verifica la conexión a Supabase.");
+            }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error creating/seeding database. API will continue but database operations may fail.");
+            logger.LogError(ex, "Error conectando a la base de datos: {Message}", ex.Message);
+            logger.LogError("Stack trace: {StackTrace}", ex.StackTrace);
+            if (ex.InnerException != null)
+            {
+                logger.LogError("Inner exception: {InnerMessage}", ex.InnerException.Message);
+            }
+            logger.LogWarning("API continuará ejecutándose pero las operaciones de base de datos pueden fallar.");
         }
     }
 }

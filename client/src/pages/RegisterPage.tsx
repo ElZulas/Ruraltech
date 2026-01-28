@@ -27,7 +27,7 @@ export default function RegisterPage() {
 
     try {
       await register(formData.email, formData.password, formData.fullName, formData.phone || undefined, formData.location || undefined)
-      navigate('/app/dashboard')
+      navigate('/download-app')
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al registrar usuario')
     } finally {

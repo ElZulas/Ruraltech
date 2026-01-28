@@ -18,9 +18,11 @@ export default function LoginPage() {
 
     try {
       await login(email, password)
-      navigate('/app/dashboard')
+      navigate('/download-app')
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al iniciar sesión')
+      const errorMessage = err.message || err.response?.data?.message || 'Error al iniciar sesión. Verifica tu conexión y que el servidor esté corriendo.'
+      setError(errorMessage)
+      console.error('Login error:', err)
     } finally {
       setLoading(false)
     }

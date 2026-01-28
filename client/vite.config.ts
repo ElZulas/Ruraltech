@@ -15,12 +15,14 @@ export default defineConfig({
     assetsDir: 'assets',
   },
   server: {
-    port: 5173,
-    strictPort: true,
+    host: '0.0.0.0', // Escuchar en todas las interfaces para acceso desde dispositivos móviles
+    port: 3000,
+    strictPort: false,
     proxy: {
       '/api': {
-        target: 'http://localhost:5002',
+        target: 'http://localhost:5002', // El proxy funciona desde el servidor de Vite, usa localhost
         changeOrigin: true,
+        secure: false,
       }
     }
   }

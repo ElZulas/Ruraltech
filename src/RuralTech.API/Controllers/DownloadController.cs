@@ -46,23 +46,83 @@ public class DownloadController : ControllerBase
     {
         try
         {
-            // Ruta al APK de Android
-            var apkPath = Path.Combine(_environment.ContentRootPath, "..", "..", "flutter-app", "build", "app", "outputs", "flutter-apk", "app-release.apk");
-            
-            if (!System.IO.File.Exists(apkPath))
+            // Buscar versiones aprobadas: beta -> alpha -> prealpha (la más estable primero)
+            var releasePaths = new[]
             {
-                // Si no existe, crear un archivo temporal o redirigir
-                _logger.LogWarning($"APK not found at {apkPath}");
-                return NotFound(new { message = "APK no disponible. Por favor, compila la aplicación Android primero." });
+                Path.Combine(_environment.ContentRootPath, "..", "..", "flutter-app", "releases", "beta", "Cownect-Beta.apk"),
+                Path.Combine(_environment.ContentRootPath, "..", "..", "flutter-app", "releases", "alpha", "Cownect-Alpha.apk"),
+                Path.Combine(_environment.ContentRootPath, "..", "..", "flutter-app", "releases", "prealpha", "Cownect-PreAlpha.apk"),
+            };
+
+            string? apkPath = null;
+            string? apkFileName = null;
+            
+            foreach (var path in releasePaths)
+            {
+                if (System.IO.File.Exists(path))
+                {
+                    apkPath = path;
+                    apkFileName = Path.GetFileName(path);
+                    break;
+                }
+            }
+            
+            if (apkPath == null || !System.IO.File.Exists(apkPath))
+            {
+                _logger.LogWarning($"No approved release found. Searched: {string.Join(", ", releasePaths)}");
+                return NotFound(new { message = "No hay versión aprobada disponible. Las versiones de prueba (test1.apk, test2.apk, etc.) no están disponibles para descarga pública." });
             }
 
             var fileBytes = System.IO.File.ReadAllBytes(apkPath);
-            return File(fileBytes, "application/vnd.android.package-archive", "RuralTech.apk");
+            _logger.LogInformation($"Serving approved release from: {apkPath}");
+            return File(fileBytes, "application/vnd.android.package-archive", apkFileName ?? "Cownect-Android.apk");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error downloading Android APK");
             return StatusCode(500, new { message = "Error al descargar el APK" });
+        }
+    }
+
+    [HttpGet("android/snapshot")]
+    public IActionResult DownloadAndroidSnapshot()
+    {
+        try
+        {
+            // Buscar snapshots: snapshot10 -> snapshot9 -> ... -> snapshot1 (el más reciente primero)
+            var snapshotPaths = new List<string>();
+            for (int i = 10; i >= 1; i--)
+            {
+                snapshotPaths.Add(Path.Combine(_environment.ContentRootPath, "..", "..", "flutter-app", "releases", "snapshots", $"snapshot{i}.apk"));
+            }
+
+            string? apkPath = null;
+            string? apkFileName = null;
+            
+            foreach (var path in snapshotPaths)
+            {
+                if (System.IO.File.Exists(path))
+                {
+                    apkPath = path;
+                    apkFileName = Path.GetFileName(path);
+                    break;
+                }
+            }
+            
+            if (apkPath == null || !System.IO.File.Exists(apkPath))
+            {
+                _logger.LogWarning($"No snapshot found. Searched: {string.Join(", ", snapshotPaths)}");
+                return NotFound(new { message = "No hay snapshots disponibles actualmente." });
+            }
+
+            var fileBytes = System.IO.File.ReadAllBytes(apkPath);
+            _logger.LogInformation($"Serving snapshot from: {apkPath}");
+            return File(fileBytes, "application/vnd.android.package-archive", apkFileName ?? "Cownect-Snapshot.apk");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error downloading Android Snapshot");
+            return StatusCode(500, new { message = "Error al descargar el snapshot" });
         }
     }
 

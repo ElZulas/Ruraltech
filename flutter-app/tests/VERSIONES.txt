@@ -1,0 +1,36 @@
+VERSIONS DE PRUEBA - COWNECT
+=============================
+
+test1.apk
+---------
+- Configuración: localhost:5002
+- Uso: Para pruebas en emulador o cuando el servidor corre en la misma máquina
+- Fecha: Primera compilación
+- Nota: No funciona en dispositivos físicos (localhost se refiere al dispositivo)
+
+test2.apk
+---------
+- Configuración: 192.168.1.64:5002
+- Uso: Para pruebas en dispositivos físicos Android en la misma red WiFi
+- Fecha: Segunda compilación (corrección de IP)
+- Nota: Requiere que el dispositivo esté en la misma red que la computadora servidor
+
+test3.apk
+---------
+- Configuración: 192.168.1.64:5002
+- Uso: Para pruebas en dispositivos físicos Android en la misma red WiFi
+- Fecha: Tercera compilación
+- Mejoras:
+  * Manejo mejorado de errores de conexión
+  * Timeout aumentado a 30 segundos
+  * Mensajes de error más claros y útiles
+  * Mejor detección de problemas de red
+- Nota: Requiere que el dispositivo esté en la misma red que la computadora servidor
+
+INSTRUCCIONES
+-------------
+1. test1.apk: Usar solo en emulador o desarrollo local
+2. test2.apk: Usar en dispositivo físico Android (misma red WiFi)
+3. test3.apk: Versión mejorada con mejor manejo de errores (recomendado)
+4. Asegúrate de que el servidor esté corriendo en el puerto 5002
+5. Si cambias de red WiFi, actualiza la IP en api_config.dart y recompila

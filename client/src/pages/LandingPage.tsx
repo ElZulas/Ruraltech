@@ -1,13 +1,54 @@
 import { Link } from 'react-router-dom'
-import { CheckCircle, Smartphone, Scale, Syringe, FileText, ShoppingBag, BarChart3, Shield, Users, Clock, ArrowRight, Phone, Mail as MailIcon } from 'lucide-react'
+import { CheckCircle, Smartphone, Scale, Syringe, FileText, ShoppingBag, BarChart3, Shield, Users, Clock, ArrowRight, Phone, Mail as MailIcon, Send } from 'lucide-react'
 import { useState } from 'react'
+import api from '../services/api'
 
 export default function LandingPage() {
   const [isAnimating, setIsAnimating] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  })
+  const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [formMessage, setFormMessage] = useState('')
 
   const handleLinkClick = () => {
     setIsAnimating(true)
     setTimeout(() => setIsAnimating(false), 600)
+  }
+
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormStatus('loading')
+    setFormMessage('')
+
+    try {
+      // Guardar en Users como lead
+      const response = await api.post('/auth/register-lead', {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || null,
+        message: formData.message || null
+      })
+      setFormStatus('success')
+      setFormMessage(response.data.message || '¡Gracias por tu interés! Te hemos registrado. Revisa tu email para más información.')
+      setFormData({ name: '', email: '', phone: '', message: '' })
+      
+      // Resetear el mensaje de éxito después de 5 segundos
+      setTimeout(() => {
+        setFormStatus('idle')
+        setFormMessage('')
+      }, 5000)
+    } catch (error: any) {
+      setFormStatus('error')
+      setFormMessage(error.response?.data?.message || 'Error al enviar el formulario. Por favor intenta más tarde.')
+    }
   }
 
   return (
@@ -219,6 +260,107 @@ export default function LandingPage() {
               <p className="text-lg text-gray-800 font-normal leading-relaxed">Utilice las herramientas del sistema para gestionar y optimizar su producción</p>
             </div>
           </div>
+        </div>
+
+        {/* Sección: Formulario de Contacto */}
+        <div className="bg-white rounded-2xl shadow-2xl p-10 mb-8 border border-black">
+          <h2 className="text-3xl font-bold text-black mb-8 text-center border-b-2 border-black pb-4">
+            ¿Interesado en Cownect?
+          </h2>
+          <p className="text-xl text-gray-800 text-center mb-8 font-normal">
+            Déjanos tus datos y nos pondremos en contacto contigo pronto
+          </p>
+          
+          <form onSubmit={handleFormSubmit} className="max-w-2xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label htmlFor="name" className="block text-xl font-bold text-black mb-2">
+                  Nombre Completo *
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={handleFormChange}
+                  className="w-full px-6 py-4 text-lg border border-black rounded-xl focus:ring-4 focus:ring-black focus:border-black bg-white text-black font-normal"
+                  placeholder="Juan Pérez"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="email" className="block text-xl font-bold text-black mb-2">
+                  Email *
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleFormChange}
+                  className="w-full px-6 py-4 text-lg border border-black rounded-xl focus:ring-4 focus:ring-black focus:border-black bg-white text-black font-normal"
+                  placeholder="juan@example.com"
+                />
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <label htmlFor="phone" className="block text-xl font-bold text-black mb-2">
+                Teléfono (Opcional)
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={handleFormChange}
+                className="w-full px-6 py-4 text-lg border border-black rounded-xl focus:ring-4 focus:ring-black focus:border-black bg-white text-black font-normal"
+                placeholder="+57 300 123 4567"
+              />
+            </div>
+            
+            <div className="mb-6">
+              <label htmlFor="message" className="block text-xl font-bold text-black mb-2">
+                Mensaje (Opcional)
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                rows={4}
+                value={formData.message}
+                onChange={handleFormChange}
+                className="w-full px-6 py-4 text-lg border border-black rounded-xl focus:ring-4 focus:ring-black focus:border-black bg-white text-black font-normal resize-none"
+                placeholder="Cuéntanos sobre tu explotación ganadera o cualquier pregunta que tengas..."
+              />
+            </div>
+            
+            {formMessage && (
+              <div className={`mb-6 p-4 rounded-xl border-2 ${
+                formStatus === 'success' 
+                  ? 'bg-green-50 border-green-500 text-green-800' 
+                  : 'bg-red-50 border-red-500 text-red-800'
+              }`}>
+                <p className="font-semibold">{formMessage}</p>
+              </div>
+            )}
+            
+            <button
+              type="submit"
+              disabled={formStatus === 'loading'}
+              className="w-full bg-black text-white py-6 rounded-xl text-2xl font-bold hover:bg-gray-800 transition-all shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed border border-black flex items-center justify-center gap-3"
+            >
+              {formStatus === 'loading' ? (
+                <>Enviando...</>
+              ) : (
+                <>
+                  Enviar Registro
+                  <Send className="h-6 w-6" />
+                </>
+              )}
+            </button>
+          </form>
         </div>
 
         {/* Footer */}
