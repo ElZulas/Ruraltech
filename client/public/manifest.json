@@ -1,7 +1,7 @@
 {
-  "name": "RuralTech - Gestión Inteligente de Ganado",
-  "short_name": "RuralTech",
-  "description": "Aplicación para gestión completa de ganado",
+  "name": "Cownect - Sistema de Gestión Ganadera",
+  "short_name": "Cownect",
+  "description": "Plataforma profesional para la gestión integral de explotaciones ganaderas",
   "start_url": "/app/dashboard",
   "display": "standalone",
   "background_color": "#ffffff",

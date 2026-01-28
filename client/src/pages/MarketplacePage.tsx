@@ -67,7 +67,7 @@ export default function MarketplacePage() {
 
   const handleContact = (product: Product) => {
     if (product.whatsApp) {
-      const message = `Hola, estoy interesado en ${product.name} publicado en RuralTech.`
+      const message = `Hola, estoy interesado en ${product.name} publicado en Cownect.`
       const whatsappUrl = `https://wa.me/${product.whatsApp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`
       window.open(whatsappUrl, '_blank')
     } else if (product.phone) {

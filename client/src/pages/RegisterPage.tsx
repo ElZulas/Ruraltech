@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Beef } from 'lucide-react'
+import { Home } from 'lucide-react'
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -36,25 +36,39 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-green-50 to-orange-50 px-4 py-8">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-green-600 rounded-2xl mb-4">
-            <Beef className="h-8 w-8 text-white" />
+    <div className="min-h-screen flex items-center justify-center px-4 py-8">
+      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-10 border border-black mx-auto">
+        {/* Botón Volver al Inicio */}
+        <div className="mb-6">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-lg text-black font-semibold hover:text-gray-700 transition-all"
+          >
+            <Home className="h-5 w-5" />
+            Volver al Inicio
+          </Link>
+        </div>
+        
+        {/* Header Estructurado */}
+        <div className="text-center mb-10 border-b-2 border-black pb-6">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-2xl mb-6 shadow-xl border border-black overflow-hidden p-2">
+            <img src={`${import.meta.env.BASE_URL}images/logo_front.jpeg`} alt="Cownect Logo" className="w-full h-full object-contain max-w-full max-h-full" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">RuralTech</h1>
-          <p className="text-gray-600">Crea tu cuenta gratuita</p>
+          <h1 className="text-4xl font-bold text-black mb-2">Cownect</h1>
+          <div className="w-24 h-1 bg-black mx-auto mb-3"></div>
+          <p className="text-xl text-black font-semibold">Registro de Usuario</p>
+          <p className="text-lg text-black mt-2 font-normal">Complete el formulario con sus datos para crear su cuenta de acceso</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+          <div className="mb-6 p-4 bg-red-100 border border-red-500 text-red-900 rounded-xl text-lg font-bold">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="fullName" className="block text-xl font-bold text-black mb-2">
               Nombre Completo
             </label>
             <input
@@ -64,13 +78,13 @@ export default function RegisterPage() {
               value={formData.fullName}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-6 py-4 text-lg border border-black rounded-xl focus:ring-4 focus:ring-black focus:border-black bg-white text-black font-normal"
               placeholder="Juan Pérez"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-xl font-bold text-black mb-2">
               Email
             </label>
             <input
@@ -80,13 +94,13 @@ export default function RegisterPage() {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-6 py-4 text-lg border border-black rounded-xl focus:ring-4 focus:ring-black focus:border-black bg-white text-black font-normal"
               placeholder="tu@email.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" className="block text-xl font-bold text-black mb-2">
               Contraseña
             </label>
             <input
@@ -96,13 +110,13 @@ export default function RegisterPage() {
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-6 py-4 text-lg border border-black rounded-xl focus:ring-4 focus:ring-black focus:border-black bg-white text-black font-normal"
               placeholder="••••••••"
             />
           </div>
 
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="phone" className="block text-xl font-bold text-black mb-2">
               Teléfono (Opcional)
             </label>
             <input
@@ -111,13 +125,13 @@ export default function RegisterPage() {
               type="tel"
               value={formData.phone}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-6 py-4 text-lg border border-black rounded-xl focus:ring-4 focus:ring-black focus:border-black bg-white text-black font-normal"
               placeholder="+57 300 123 4567"
             />
           </div>
 
           <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="location" className="block text-xl font-bold text-black mb-2">
               Ubicación (Opcional)
             </label>
             <input
@@ -126,7 +140,7 @@ export default function RegisterPage() {
               type="text"
               value={formData.location}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-6 py-4 text-lg border border-black rounded-xl focus:ring-4 focus:ring-black focus:border-black bg-white text-black font-normal"
               placeholder="Cundinamarca, Colombia"
             />
           </div>
@@ -134,15 +148,15 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-black text-white py-6 rounded-xl text-2xl font-bold hover:bg-gray-800 transition-all shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed border border-black"
           >
             {loading ? 'Registrando...' : 'Crear Cuenta'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <p className="mt-8 text-center text-xl text-black font-semibold">
           ¿Ya tienes cuenta?{' '}
-          <Link to="/login" className="text-blue-600 font-semibold hover:underline">
+          <Link to="/login" className="text-black font-bold hover:underline underline">
             Inicia sesión aquí
           </Link>
         </p>
